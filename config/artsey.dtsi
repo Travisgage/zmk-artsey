@@ -136,7 +136,7 @@
 #endif
 
 /*
- * NEW: Sticky modifier lifetime should be short to prevent accidental Win+H (voice typing)
+ * Sticky modifier lifetime should be short to prevent accidental Win+H (voice typing)
  * when the GUI sticky combo fires unintentionally.
  */
 #if !defined TIMEOUT_STICKY_MOD_KEY
@@ -177,7 +177,7 @@
 			label = "Custom";                                          \
 			bindings = <                                               \
 				LEADING_NONES                                          \
-				&none               &kp C_VOL_UP  &kp INS   &kp C_MUTE \
+				&kp LG(H)           &kp C_VOL_UP  &kp INS   &kp C_MUTE \
 				MIDDLE_NONES                                           \
 				&mo LAYER_ID_CUSTOM &kp C_VOL_DN  &kp PSCRN &sk RSHFT  \
 				TRAILING_NONES                                         \
