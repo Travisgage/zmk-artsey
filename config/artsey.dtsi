@@ -52,6 +52,7 @@
  *  ONLY ENABLE ONE OF THESE
 *****************************************/
 //#define ARTSEY_RIGHT 1
+/* NOTE: In your corne_artsey_left.keymap you enable these before including artsey.dtsi. */
 //#define ARTSEY_LEFT 1
 //#define ARTSEY_BIG 1
 // If you use COLEMAK as your standard keyboard layout, you may want this
@@ -128,12 +129,24 @@
 #if !defined TIMEOUT_LAYER_HOLD
 #define TIMEOUT_LAYER_HOLD 200
 #endif
+
+/* Sticky “leader” concept can stay long. */
 #if !defined TIMEOUT_STICKY_LEADER_KEY
 #define TIMEOUT_STICKY_LEADER_KEY 5000
 #endif
+
+/*
+ * NEW: Sticky modifier lifetime should be short to prevent accidental Win+H (voice typing)
+ * when the GUI sticky combo fires unintentionally.
+ */
+#if !defined TIMEOUT_STICKY_MOD_KEY
+#define TIMEOUT_STICKY_MOD_KEY 700
+#endif
+
 &sk {
-	release-after-ms = <TIMEOUT_STICKY_LEADER_KEY>;
+	release-after-ms = <TIMEOUT_STICKY_MOD_KEY>;
 };
+
 &sl {
 	release-after-ms = <TIMEOUT_STICKY_LEADER_KEY>;
 };
@@ -228,9 +241,19 @@
 		combo_layer_functions { key-positions = <KEY_F_TOP KEY_F_BOTTOM>; bindings = <&sl LAYER_ID_BIG_FUNCTION>; };
 		#endif
 		combo_enter      { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_E>; bindings = <&kp ENTER>; };
+
+		/* Optional hardening (commented by default): require-prior-idle-ms reduces accidental sticky mods from overlap.
+		 * Uncomment if you still see “stuck GUI” behavior after shortening TIMEOUT_STICKY_MOD_KEY.
+		 *
+		 * combo_control { timeout-ms = <TIMEOUT_COMBO_2>; require-prior-idle-ms = <40>; key-positions = <KEY_E KEY_S>; bindings = <&sk LCTRL>; };
+		 * combo_gui     { timeout-ms = <TIMEOUT_COMBO_2>; require-prior-idle-ms = <40>; key-positions = <KEY_Y KEY_S>; bindings = <&sk LGUI>;  };
+		 * combo_alt     { timeout-ms = <TIMEOUT_COMBO_2>; require-prior-idle-ms = <40>; key-positions = <KEY_I KEY_S>; bindings = <&sk LALT>;  };
+		 */
+
 		combo_control    { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_S>; bindings = <&sk LCTRL>; };
 		combo_gui        { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_Y KEY_S>; bindings = <&sk LGUI>; };
 		combo_alt        { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_S>; bindings = <&sk LALT>; };
+
 		combo_backspace  { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_R>; bindings = <&kp BACKSPACE>; };
 		combo_delete     { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_R>; bindings = <&kp DELETE>; };
 		combo_shift_lock { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_Y>; bindings = <&kt LSHFT>; };
@@ -290,24 +313,54 @@
  *****************************************/
 / {
 	behaviors {
-		layer_base_kp: layer_base_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_base_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
-						bindings = <&mo>, <&kp>; };
-		layer_numbers_kp: layer_numbers_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_numbers_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
-						bindings = <&mo>, <&kp>; };
-		layer_symbols_kp: layer_symbols_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_symbols_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
-						bindings = <&mo>, <&kp>; };
-		layer_parentheticals_kp: layer_parentheticals_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_parentheticals_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
-						bindings = <&mo>, <&kp>; };
-		layer_custom_kp: layer_custom_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_custom_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
-						bindings = <&mo>, <&kp>; };
-		ctrl_alt_kp: ctrl_alt_kp { compatible = "zmk,behavior-hold-tap"; label = "ctrl_alt_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
-						bindings = <&sk>, <&sk>; };
+		layer_base_kp: layer_base_kp {
+			compatible = "zmk,behavior-hold-tap";
+			label = "layer_base_kp";
+			#binding-cells = <2>;
+			tapping_term_ms = <TIMEOUT_LAYER_HOLD>;
+			flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>;
+		};
+		layer_numbers_kp: layer_numbers_kp {
+			compatible = "zmk,behavior-hold-tap";
+			label = "layer_numbers_kp";
+			#binding-cells = <2>;
+			tapping_term_ms = <TIMEOUT_LAYER_HOLD>;
+			flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>;
+		};
+		layer_symbols_kp: layer_symbols_kp {
+			compatible = "zmk,behavior-hold-tap";
+			label = "layer_symbols_kp";
+			#binding-cells = <2>;
+			tapping_term_ms = <TIMEOUT_LAYER_HOLD>;
+			flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>;
+		};
+		layer_parentheticals_kp: layer_parentheticals_kp {
+			compatible = "zmk,behavior-hold-tap";
+			label = "layer_parentheticals_kp";
+			#binding-cells = <2>;
+			tapping_term_ms = <TIMEOUT_LAYER_HOLD>;
+			flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>;
+		};
+		layer_custom_kp: layer_custom_kp {
+			compatible = "zmk,behavior-hold-tap";
+			label = "layer_custom_kp";
+			#binding-cells = <2>;
+			tapping_term_ms = <TIMEOUT_LAYER_HOLD>;
+			flavor = "tap-preferred";
+			bindings = <&mo>, <&kp>;
+		};
+		ctrl_alt_kp: ctrl_alt_kp {
+			compatible = "zmk,behavior-hold-tap";
+			label = "ctrl_alt_kp";
+			#binding-cells = <2>;
+			tapping_term_ms = <TIMEOUT_LAYER_HOLD>;
+			flavor = "tap-preferred";
+			bindings = <&sk>, <&sk>;
+		};
 	};
 };
 
