@@ -23,30 +23,14 @@
 #define KEY_O 7
 
 // Define Offsets
-#define LEADING_NONES  NONE(0,0,1)
-#define MIDDLE_NONES   NONE(0,0,2)
-#define TRAILING_NONES NONE(0,1,0)
+#define LEADING_NONES NONE(0,0,1)
+#define MIDDLE_NONES NONE(0, 0, 2)
+#define TRAILING_NONES NONE(0, 1, 0)
 
 // Thumb buttons (used for BT combos)
 #define THUMB_1 18
 #define THUMB_2 19
 #define THUMB_3 20
-
-/*
- * Override ARTSEY custom layer BEFORE including artsey.dtsi.
- * Put Win+H on the Custom layer so it is definitely reachable.
- */
-#define ARTSEY_LAYER_CUSTOM                                            \
-        custom {                                                       \
-            label = "Custom";                                          \
-            bindings = <                                               \
-                LEADING_NONES                                          \
-                &none               &kp C_VOL_UP  &kp LGUI(H) &kp C_MUTE \
-                MIDDLE_NONES                                           \
-                &mo LAYER_ID_CUSTOM &kp C_VOL_DN  &kp PSCRN   &sk RSHFT  \
-                TRAILING_NONES                                         \
-            >;                                                         \
-        };
 
 // Include main artsey.io keymap
 #include "../../../artsey.dtsi"
