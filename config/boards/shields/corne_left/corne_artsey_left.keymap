@@ -11,27 +11,27 @@
 /* Enable ARTSEY Left */
 #define ARTSEY_LEFT 1
 
-/* ARTS Row (top row, left hand) */
+/* ARTS row */
 #define KEY_A 4
 #define KEY_R 3
 #define KEY_T 2
 #define KEY_S 1
 
-/* EYIO Row (bottom row, left hand) */
+/* EYIO row */
 #define KEY_E 10
 #define KEY_Y 9
 #define KEY_I 8
 #define KEY_O 7
 
-/* Layout offsets for Corne left */
+/* Corne left layout offsets */
 #define LEADING_NONES  NONE(0,0,1)
 #define MIDDLE_NONES   NONE(0,0,2)
 #define TRAILING_NONES NONE(0,1,0)
 
-/* Thumb positions (used by ARTSEY BT layer) */
+/* Thumb keys (BT layer) */
 #define THUMB_1 18
 #define THUMB_2 19
 #define THUMB_3 20
 
-/* Pull in the complete ARTSEY implementation */
+/* Include the ARTSEY implementation */
 #include "../../../artsey.dtsi"
