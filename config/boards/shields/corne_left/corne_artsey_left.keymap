@@ -39,9 +39,9 @@
   &kp UP              \
   &kp RIGHT           \
   &kp LG(H)           \
-  &kp SPACE           \
+  &kp ENTER           \
   &kp BACKSPACE       \
-  &kp ENTER
+  &kp SPACE
 
 
 // Thumb buttons (used for BT combos)
