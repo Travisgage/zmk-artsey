@@ -32,5 +32,14 @@
 #define THUMB_2 19
 #define THUMB_3 20
 
-// Include main artsey.io keymap
 #include "../../../artsey.dtsi"
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        base {
+            bindings = <>;
+        };
+    };
+};
