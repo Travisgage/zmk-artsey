@@ -39,7 +39,7 @@
  *   - Please note: A/E key positions should be on your INDEX finger
  *     - The online reference is for right handed use
  *     - When using the ARTSEY layout left handed you'll want to ensure your keypositions are flipped along the Y axis
- *   - Update/adjust the key positions using your boards keymap
+ *   - Update/adjust the key positions using your boards keymap 
  *     - See below for additional details
  *   - YOU MUST SET THE FOLLOWING CONFIG VALUES FOR THIS SETUP TO WORK PROPERLY IN YOUR BOARDS .conf FILE
  *     - CONFIG_ZMK_COMBO_MAX_COMBOS_PER_KEY=16
@@ -61,7 +61,7 @@
 /*****************************************
  * Define key positions used for combos
  * These definitions are used to define the various ARTSEY combos
- *
+ * 
  * Please see the documentation on "combos" for details on how to find the proper key positions
  *
  * Default key positions are for a generic 4x2 keyboard and should NOT be used outright
@@ -134,7 +134,7 @@
 &sk {
 	release-after-ms = <TIMEOUT_STICKY_LEADER_KEY>;
 };
-&sl {
+&sl { 
 	release-after-ms = <TIMEOUT_STICKY_LEADER_KEY>;
 };
 
@@ -250,7 +250,7 @@
 		combo_period      { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_I>; bindings = <&kp PERIOD>; };
 		combo_slash       { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_O>; bindings = <&kp SLASH>; };
 		combo_exclamation { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_T KEY_I>; bindings = <&kp EXCL>; };
-
+		
 		combo_seven { layers = <LAYER_ID_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_R>; bindings = <&kp N7>; };
 		combo_eight { layers = <LAYER_ID_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_T>; bindings = <&kp N8>; };
 		combo_nine  { layers = <LAYER_ID_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_Y>; bindings = <&kp N9>; };
@@ -269,7 +269,7 @@
 		combo_x            { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_R KEY_T KEY_S>; bindings = <&kp X>; };
 		combo_l            { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_E KEY_Y KEY_I>; bindings = <&kp L>; };
 		combo_single_quote { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_Y KEY_I>; bindings = <&kp SQT>; };
-
+		
 		/*****************************************
 		 * 4 key combos
 		 *****************************************/
@@ -290,14 +290,14 @@
  *****************************************/
 / {
 	behaviors {
-		layer_base_kp: layer_base_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_base_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+		layer_base_kp: layer_base_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_base_kp"; 
+						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred"; 
 						bindings = <&mo>, <&kp>; };
-		layer_numbers_kp: layer_numbers_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_numbers_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+		layer_numbers_kp: layer_numbers_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_numbers_kp"; 
+						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred"; 
 						bindings = <&mo>, <&kp>; };
-		layer_symbols_kp: layer_symbols_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_symbols_kp";
-						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
+		layer_symbols_kp: layer_symbols_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_symbols_kp"; 
+						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred"; 
 						bindings = <&mo>, <&kp>; };
 		layer_parentheticals_kp: layer_parentheticals_kp { compatible = "zmk,behavior-hold-tap"; label = "layer_parentheticals_kp";
 						#binding-cells = <2>; tapping_term_ms = <TIMEOUT_LAYER_HOLD>; flavor = "tap-preferred";
@@ -312,7 +312,7 @@
 };
 
 /*****************************************
- * Standard ARTSEY layer definitions
+ * Standard ARTSEY layer definitions 
  * !!!!!!!!!! FOR RIGHT HANDED USE !!!!!!!!!!
  *****************************************/
 #if defined ARTSEY_RIGHT
@@ -435,7 +435,7 @@
 #endif
 
 /*****************************************
- * Standard ARTSEY layer definitions
+ * Standard ARTSEY layer definitions 
  * !!!!!!!!!! FOR LEFT HANDED USE !!!!!!!!!!
  *****************************************/
 #if defined ARTSEY_LEFT
@@ -534,7 +534,7 @@
 				BIG_BETWEEN_ROW_TWO_THREE_NONES
 				&kp ASTRK &kp LBKT &kp RBKT &kp PRCNT &kp PIPE
 				BIG_BETWEEN_ROW_THREE_THUMBS
-				&none     &kp SEMI &none
+				&none     &kp LG(H) &none
 				BIG_TRAILING_NONES
 			>;
 		};
@@ -554,25 +554,5 @@
 		};
 		#endif
 	};
-};
-#endif
-
-/*****************************************
- * Local override: LEFT + BIG symbol layer
- * Replace middle thumb with Win+H (Windows voice dictation)
- *****************************************/
-#if defined ARTSEY_LEFT && defined ARTSEY_BIG
-&{/keymap/big_artsey_symbol} {
-    bindings = <
-        BIG_LEADING_NONES
-        &kp CARET &kp LBRC &kp RBRC &kp HASH  &kp GRAVE
-        BIG_BETWEEN_ROW_ONE_TWO_NONES
-        &kp AMPS  &kp LPAR &kp RPAR &kp DLLR  &kp BSLH
-        BIG_BETWEEN_ROW_TWO_THREE_NONES
-        &kp ASTRK &kp LBKT &kp RBKT &kp PRCNT &kp PIPE
-        BIG_BETWEEN_ROW_THREE_THUMBS
-        &none     &kp LGUI(H)   &none
-        BIG_TRAILING_NONES
-    >;
 };
 #endif
