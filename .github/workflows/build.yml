@@ -125,6 +125,18 @@ jobs:
       - name: Build (west build)
         run: west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
 
+      - name: Dump preprocessed DTS on failure
+        if: failure()
+        run: |
+          echo "=== Find *.dts.pre.tmp ==="
+          find build -type f -name "*.dts.pre.tmp" -print || true
+
+          echo "=== nice_nano.dts.pre.tmp around line 544 ==="
+          nl -ba build/zephyr/nice_nano.dts.pre.tmp | sed -n '520,560p' || true
+
+          echo "=== Raw characters (cat -A) ==="
+          sed -n '540,548p' build/zephyr/nice_nano.dts.pre.tmp | cat -A || true
+
       - name: ARTSEY implementation dtsi file
         if: always()
         run: cat -n config/artsey.dtsi
