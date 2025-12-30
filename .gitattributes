@@ -1,0 +1,8 @@
+# Enforce LF for devicetree/keymap sources (critical for Zephyr/ZMK preprocessing)
+*.dts  text eol=lf
+*.dtsi text eol=lf
+*.overlay text eol=lf
+*.keymap text eol=lf
+
+# Reasonable defaults
+* text=auto
