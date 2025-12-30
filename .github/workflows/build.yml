@@ -122,60 +122,61 @@ jobs:
           echo "shield-arg=${SHIELD_ARG}" >> $GITHUB_OUTPUT
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
 
-      - name: Build (west build) + dump DTS on failure
+      - name: Build (west build)
+        id: build
+        continue-on-error: true
         run: |
           set +e
-
           echo "=== Building: board=${{ matrix.board }} shield=${{ matrix.shield }} ==="
           echo "Command:"
           echo "west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG=\"${GITHUB_WORKSPACE}/config\""
-
           west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-          status=$?
+          exit $?
 
-          if [ $status -ne 0 ]; then
-            echo "=== west build failed (exit=$status). Dumping preprocessed DTS ==="
+      - name: Dump preprocessed DTS on failure
+        if: steps.build.outcome == 'failure'
+        run: |
+          PRE="build/zephyr/${{ matrix.board }}.dts.pre.tmp"
+          echo "=== Find *.dts.pre.tmp (build/**) ==="
+          find build -type f -name "*.dts.pre.tmp" -print || true
 
-            echo "=== Find *.dts.pre.tmp (build/**) ==="
-            find build -type f -name "*.dts.pre.tmp" -print || true
+          echo "=== Grep for keymap_transform_0 / pro_micro_i2c ==="
+          [ -f "$PRE" ] && grep -n "keymap_transform_0" "$PRE" | head -n 20 || true
+          [ -f "$PRE" ] && grep -n "pro_micro_i2c" "$PRE" | head -n 50 || true
 
-            echo "=== Show build/zephyr/${{ matrix.board }}.dts.pre.tmp around line 544 (if present) ==="
-            if [ -f "build/zephyr/${{ matrix.board }}.dts.pre.tmp" ]; then
-              nl -ba "build/zephyr/${{ matrix.board }}.dts.pre.tmp" | sed -n '520,560p' || true
-              echo "=== Raw characters (cat -A), lines 540-548 ==="
-              sed -n '540,548p' "build/zephyr/${{ matrix.board }}.dts.pre.tmp" | cat -A || true
-            else
-              echo "WARN: build/zephyr/${{ matrix.board }}.dts.pre.tmp not found"
-              echo "=== Listing build/zephyr ==="
-              ls -la build/zephyr || true
-            fi
-          fi
+          echo "=== Show $PRE around line 520-590 ==="
+          [ -f "$PRE" ] && nl -ba "$PRE" | sed -n '520,590p' || true
 
-          exit $status
+          echo "=== Raw characters (cat -A), lines 535-555 ==="
+          [ -f "$PRE" ] && sed -n '535,555p' "$PRE" | cat -A || true
 
       - name: ARTSEY implementation dtsi file
         if: always()
         run: cat -n config/artsey.dtsi
 
-      - name: Generated DTS file (if present)
+      - name: Generated DTS file (preprocessed)
         if: always()
         run: cat -n build/zephyr/${{ matrix.board }}.dts.pre.tmp || true
 
       - name: Prep artifact (artsey.dtsi)
         if: always()
-        run: cp config/artsey.dtsi ./artsey.dtsi || true
+        run: cp config/artsey.dtsi ./artsey.dtsi
 
       - name: Prep artifact (DTS)
         if: always()
-        run: cp build/zephyr/${{ matrix.board }}.dts.pre.tmp ./${{ matrix.shield }}-${{ matrix.board }}.dts.pre.tmp || true
+        run: |
+          PRE="build/zephyr/${{ matrix.board }}.dts.pre.tmp"
+          [ -f "$PRE" ] && cp "$PRE" "./${{ matrix.shield }}-${{ matrix.board }}.dts.pre.tmp" || true
 
       - name: Prep artifact (HEX)
         if: always()
-        run: cp build/zephyr/zmk.hex ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.hex || true
+        run: |
+          [ -f build/zephyr/zmk.hex ] && cp build/zephyr/zmk.hex "${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.hex" || true
 
       - name: Prep artifact (UF2)
         if: always()
-        run: cp build/zephyr/zmk.uf2 ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2 || true
+        run: |
+          [ -f build/zephyr/zmk.uf2 ] && cp build/zephyr/zmk.uf2 "${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2" || true
 
       - name: Archive artifacts
         if: always()
@@ -189,10 +190,15 @@ jobs:
             ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2
         continue-on-error: true
 
+      - name: Fail job if build failed
+        if: steps.build.outcome == 'failure'
+        run: exit 1
+
   release:
     runs-on: ubuntu-latest
     name: Create Release
     needs: build
+    if: github.event_name != 'pull_request'
     steps:
       - name: Get current date/time
         id: date
@@ -212,10 +218,10 @@ jobs:
 
       - name: Zip all firmware files
         run: |
-          mkdir zips
+          mkdir -p zips
           cd release
           for folder in ./*; do
-            zip -r ../zips/$(basename "$folder").zip "$folder"
+            zip -r "../zips/$(basename "$folder").zip" "$folder"
           done
 
       - name: Create release
