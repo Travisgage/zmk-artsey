@@ -34,39 +34,20 @@
 *****************************************/
 
 /*****************************************
- * Setting up ARTSEY comboing
- *   - Enabled right OR left handed orientation
- *   - Please note: A/E key positions should be on your INDEX finger
- *     - The online reference is for right handed use
- *     - When using the ARTSEY layout left handed you'll want to ensure your keypositions are flipped along the Y axis
- *   - Update/adjust the key positions using your boards keymap
- *     - See below for additional details
- *   - YOU MUST SET THE FOLLOWING CONFIG VALUES FOR THIS SETUP TO WORK PROPERLY IN YOUR BOARDS .conf FILE
- *     - CONFIG_ZMK_COMBO_MAX_COMBOS_PER_KEY=16
- *     - CONFIG_ZMK_COMBO_MAX_KEYS_PER_COMBO=8
- *     - CONFIG_ZMK_COMBO_MAX_PRESSED_COMBOS=8
- *****************************************/
-
-/*****************************************
  * Define which layout you want to use
- *  ONLY ENABLE ONE OF THESE
-*****************************************/ 
+ * ONLY ENABLE ONE OF THESE
+ *
+ * NOTE: Define ARTSEY_LEFT or ARTSEY_RIGHT in your keymap BEFORE including this file.
+*****************************************/
 //#define ARTSEY_RIGHT 1
-/* NOTE: In your corne_artsey_left.keymap you enable these before including artsey.dtsi. */
-#define ARTSEY_LEFT 1
+//#define ARTSEY_LEFT 1
 //#define ARTSEY_BIG 1
-// If you use COLEMAK as your standard keyboard layout, you may want this
 //#define ARTSEY_COLEMAK 1
 
 /*****************************************
  * Define key positions used for combos
- * These definitions are used to define the various ARTSEY combos
- *
- * Please see the documentation on "combos" for details on how to find the proper key positions
- *
- * Default key positions are for a generic 4x2 keyboard and should NOT be used outright
- * DEFINE these definitions in your boards keymap BEFORE including artsey.dtsi
- *****************************************/
+ * DEFINE these in your boards keymap BEFORE including this file
+*****************************************/
 // ARTS Row
 // #define KEY_A 0
 // #define KEY_R 1
@@ -83,10 +64,8 @@
 
 /*****************************************
  * Define key position offsets in main keymap
- *
- * In order to make this keymap flexible, you must setup the number of &none "offsets" to use
- * The defines below should be set in your LOCAL keymap and using the above "NONE([hundreds],[tens],[ones])" macro for filling in the gaps
- *****************************************/
+ * Define LEADING_NONES / MIDDLE_NONES / TRAILING_NONES in your keymap BEFORE including this file
+*****************************************/
 // #define LEADING_NONES NONE(0, 1, 0)
 // #define MIDDLE_NONES NONE(0, 0, 3)
 // #define TRAILING_NONES NONE(0, 1, 0)
@@ -98,11 +77,7 @@
 
 /*****************************************
  * Define custom BT layer extra keys
- *
- * You can override the 2 blank keys on the BT select layer by copy/pasting the below into your keymap
- *     *before* including the artsey.dtsi file
- * Once added to your keymap you can adjust these 2 keys as you see fit
- *****************************************/
+*****************************************/
 #if !defined ARTSEY_BT_TOP
 #define ARTSEY_BT_TOP &out OUT_BLE
 #endif
@@ -111,10 +86,7 @@
 #endif
 
 /*****************************************
- * Define how long it takes for the combos/holds to 'time out'
- * See documentation on "combos" for more detail
- * THE COMBO TIMEOUTS MUST BE THE SAME
- *    https://github.com/zmkfirmware/zmk/issues/905
+ * Combo / hold timing
  *****************************************/
 #if !defined TIMEOUT_COMBO_2
 #define TIMEOUT_COMBO_2 175
@@ -129,15 +101,9 @@
 #define TIMEOUT_LAYER_HOLD 200
 #endif
 
-/* Sticky “leader” concept can stay long. */
 #if !defined TIMEOUT_STICKY_LEADER_KEY
 #define TIMEOUT_STICKY_LEADER_KEY 5000
 #endif
-
-/*
- * Sticky modifier lifetime should be short to prevent accidental Win+H (voice typing)
- * when the GUI sticky combo fires unintentionally.
- */
 #if !defined TIMEOUT_STICKY_MOD_KEY
 #define TIMEOUT_STICKY_MOD_KEY 700
 #endif
@@ -151,10 +117,7 @@
 };
 
 /*****************************************
- * Define custom layer
- *
- * You can override this layer by copy/pasting the into your keymap *before* including the artsey.dtsi file
- * Once added to your keymap you can adjust as you see fit
+ * Define custom layer (optional override)
  *****************************************/
 #if !defined ARTSEY_LAYER_CUSTOM
 #if defined ARTSEY_RIGHT
@@ -176,9 +139,9 @@
 			label = "Custom";                                          \
 			bindings = <                                               \
 				LEADING_NONES                                          \
-				&none          &kp C_VOL_UP  &kp INS   &kp C_MUTE \
+				&none          &kp C_VOL_UP  &kp INS   &kp C_MUTE       \
 				MIDDLE_NONES                                           \
-				&mo LAYER_ID_CUSTOM &kp C_VOL_DN  &kp PSCRN &sk THUMB_1  \
+				&mo LAYER_ID_CUSTOM &kp C_VOL_DN  &kp PSCRN &sk RSHFT   \
 				TRAILING_NONES                                         \
 			>;                                                         \
 		};
@@ -186,19 +149,54 @@
 #endif
 
 /*****************************************
- * Standard ARTSEY combo definitions
- * These should NOT be changed and are global in scope
+ * Base letter definitions (Colemak option preserved)
  *****************************************/
-/ {
+#define ARTSEY_BASE_A A
+#define ARTSEY_BASE_R R
+#define ARTSEY_BASE_T T
+#define ARTSEY_BASE_S S
+#define ARTSEY_BASE_E E
+#define ARTSEY_BASE_Y Y
+#define ARTSEY_BASE_I I
+#define ARTSEY_BASE_O O
+#define ARTSEY_COMBO_N N
+#if ARTSEY_COLEMAK
+#define ARTSEY_BASE_A T
+#define ARTSEY_BASE_R S
+#define ARTSEY_BASE_T R
+#define ARTSEY_BASE_S A
+#define ARTSEY_BASE_E N
+#define ARTSEY_BASE_Y E
+#define ARTSEY_BASE_I I
+#define ARTSEY_BASE_O O
+#define ARTSEY_COMBO_N Y
+#endif
+
+/*****************************************
+ * Layer IDs (do not change order)
+ *****************************************/
+#define LAYER_ID_GLOBAL -1
+#define LAYER_ID_BASE 0
+#define LAYER_ID_NUMBERS 1
+#define LAYER_ID_SYMBOLS 2
+#define LAYER_ID_PARENTHETICALS 3
+#define LAYER_ID_NAVIGATION 4
+#define LAYER_ID_BT_SEL 5
+#define LAYER_ID_CUSTOM 6
+#define LAYER_ID_BIG_SYM 7
+#define LAYER_ID_BIG_FUNCTION 8
+
+/*****************************************
+ * Combo definitions (unchanged core ARTSEY)
+ *****************************************/
+ / {
 	combos {
 		compatible = "zmk,combos";
-		/*****************************************
-		 * 2 key combos
-		 *****************************************/
-		// Function layer doesn't apply to non-big artsey presently
+
 		#if defined ARTSEY_BIG
 		combo_layer_functions { key-positions = <KEY_F_TOP KEY_F_BOTTOM>; bindings = <&sl LAYER_ID_BIG_FUNCTION>; };
 		#endif
+
 		combo_enter      { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_A KEY_E>; bindings = <&kp ENTER>; };
 
 		combo_control    { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_S>; bindings = <&sk LCTRL>; };
@@ -207,7 +205,7 @@
 
 		combo_backspace  { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_R>; bindings = <&kp BACKSPACE>; };
 		combo_delete     { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_R>; bindings = <&kp DELETE>; };
-		combo_shift_lock { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <THUMB_1 KEY_Y>; bindings = <&kt LSHFT>; }; // Shift moved to Thumb_1
+		combo_shift_lock { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_Y>; bindings = <&kt LSHFT>; };
 
 		combo_b           { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_O>; bindings = <&kp B>; };
 		combo_c           { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_Y>; bindings = <&kp C>; };
@@ -230,9 +228,6 @@
 		combo_nine  { layers = <LAYER_ID_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_Y>; bindings = <&kp N9>; };
 		combo_zero  { layers = <LAYER_ID_NUMBERS>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_Y KEY_I>; bindings = <&kp N0>; };
 
-		/*****************************************
-		 * 3 key combos
-		 *****************************************/
 		combo_esc              { timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_R KEY_O>; bindings = <&kp ESC>; };
 		combo_layer_navigation { timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_R KEY_E KEY_I>; bindings = <&tog LAYER_ID_NAVIGATION>; };
 
@@ -244,9 +239,6 @@
 		combo_l            { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_E KEY_Y KEY_I>; bindings = <&kp L>; };
 		combo_single_quote { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_Y KEY_I>; bindings = <&kp SQT>; };
 
-		/*****************************************
-		 * 4 key combos
-		 *****************************************/
 		combo_tab             { timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_A KEY_R KEY_T KEY_O>; bindings = <&kp TAB>; };
 		combo_space           { timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_E KEY_Y KEY_I KEY_O>; bindings = <&kp SPACE>; };
 		combo_shift           { timeout-ms = <TIMEOUT_COMBO_4>; key-positions = <KEY_E KEY_R KEY_T KEY_S>; bindings = <&sk LSHFT>; };
@@ -259,10 +251,9 @@
 };
 
 /*****************************************
- * Standard ARTSEY layer activation definitions
- * These should NOT be changed and are global in scope
+ * Layer activation behaviors
  *****************************************/
-{
+ / {
 	behaviors {
 		layer_base_kp: layer_base_kp {
 			compatible = "zmk,behavior-hold-tap";
@@ -314,3 +305,165 @@
 		};
 	};
 };
+
+/*****************************************
+ * Keymap layers (RIGHT and LEFT)
+ *****************************************/
+
+#if defined ARTSEY_RIGHT
+/ {
+	keymap {
+		compatible = "zmk,keymap";
+
+		#if defined ARTSEY_BIG
+		/* (Big ARTSEY right omitted here; keep if you use it) */
+		#else
+		base {
+			label = "ARTSEY";
+			bindings = <
+				LEADING_NONES
+				&layer_parentheticals_kp LAYER_ID_PARENTHETICALS ARTSEY_BASE_A  &kp ARTSEY_BASE_R     &kp ARTSEY_BASE_T     &layer_numbers_kp LAYER_ID_NUMBERS ARTSEY_BASE_S
+				MIDDLE_NONES
+				&layer_symbols_kp LAYER_ID_SYMBOLS ARTSEY_BASE_E                &kp ARTSEY_BASE_Y     &kp ARTSEY_BASE_I     &layer_custom_kp LAYER_ID_CUSTOM ARTSEY_BASE_O
+				TRAILING_NONES
+				#if defined CUSTOM_THUMB
+				CUSTOM_THUMB
+				#endif
+			>;
+		};
+		#endif
+
+		numbers {
+			label = "Number";
+			bindings = <
+				LEADING_NONES
+				&kp N1                                              &kp N2    &kp N3    &mo LAYER_ID_NUMBERS
+				MIDDLE_NONES
+				&kp N4                                              &kp N5    &kp N6    &none
+				TRAILING_NONES
+			>;
+		};
+		symbols {
+			label = "Symbol";
+			bindings = <
+				LEADING_NONES
+				&kp EXCL                                            &kp BSLH  &kp SEMI  &kp GRAVE
+				MIDDLE_NONES
+				&mo LAYER_ID_SYMBOLS                                &kp QMARK &kp MINUS &kp EQUAL
+				TRAILING_NONES
+			>;
+		};
+		parentheticals {
+			label = "Paren";
+			bindings = <
+				LEADING_NONES
+				&mo LAYER_ID_PARENTHETICALS                         &kp LPAR  &kp RPAR  &kp LBRC
+				MIDDLE_NONES
+				&none                                               &kp LBKT  &kp RBKT  &kp RBRC
+				TRAILING_NONES
+			>;
+		};
+		navigation {
+			label = "Nav";
+			bindings = <
+				LEADING_NONES
+				&kp HOME                                            &kp UP    &kp END   &kp PG_UP
+				MIDDLE_NONES
+				&kp LEFT                                            &kp DOWN  &kp RIGHT &kp PG_DN
+				TRAILING_NONES
+			>;
+		};
+		bt {
+			label = "BT";
+			bindings = <
+				LEADING_NONES
+				&bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 ARTSEY_BT_TOP
+				MIDDLE_NONES
+				&bt BT_SEL 3 &bt BT_SEL 4 &bt BT_SEL 5 ARTSEY_BT_BOTTOM
+				TRAILING_NONES
+			>;
+		};
+
+		ARTSEY_LAYER_CUSTOM
+	};
+};
+#endif
+
+#if defined ARTSEY_LEFT
+/ {
+	keymap {
+		compatible = "zmk,keymap";
+
+		#if defined ARTSEY_BIG
+		/* (Big ARTSEY left omitted here; keep if you use it) */
+		#else
+		base {
+			label = "ARTSEY";
+			bindings = <
+				LEADING_NONES
+				&layer_numbers_kp LAYER_ID_NUMBERS ARTSEY_BASE_S        &kp ARTSEY_BASE_T     &kp ARTSEY_BASE_R     &layer_parentheticals_kp LAYER_ID_PARENTHETICALS ARTSEY_BASE_A
+				MIDDLE_NONES
+				&layer_custom_kp LAYER_ID_CUSTOM ARTSEY_BASE_O          &kp ARTSEY_BASE_I     &kp ARTSEY_BASE_Y     &layer_symbols_kp LAYER_ID_SYMBOLS ARTSEY_BASE_E
+				TRAILING_NONES
+				#if defined CUSTOM_THUMB
+				CUSTOM_THUMB
+				#endif
+			>;
+		};
+		#endif
+
+		numbers {
+			label = "Number";
+			bindings = <
+				LEADING_NONES
+				&mo LAYER_ID_NUMBERS                        &kp N3    &kp N2    &kp N1
+				MIDDLE_NONES
+				&none                                       &kp N6    &kp N5    &kp N4
+				TRAILING_NONES
+			>;
+		};
+		symbols {
+			label = "Symbol";
+			bindings = <
+				LEADING_NONES
+				&kp GRAVE                                   &kp SEMI  &kp BSLH  &kp EXCL
+				MIDDLE_NONES
+				&kp EQUAL                                   &kp MINUS &kp QMARK &mo LAYER_ID_SYMBOLS
+				TRAILING_NONES
+			>;
+		};
+		parentheticals {
+			label = "Paren";
+			bindings = <
+				LEADING_NONES
+				&kp LBRC                                    &kp LPAR  &kp RPAR  &mo LAYER_ID_PARENTHETICALS
+				MIDDLE_NONES
+				&kp RBRC                                    &kp LBKT  &kp RBKT  &none
+				TRAILING_NONES
+			>;
+		};
+		navigation {
+			label = "Nav";
+			bindings = <
+				LEADING_NONES
+				&kp PG_UP                                   &kp HOME  &kp UP    &kp END
+				MIDDLE_NONES
+				&kp PG_DN                                   &kp LEFT  &kp DOWN  &kp RIGHT
+				TRAILING_NONES
+			>;
+		};
+		bt {
+			label = "BT";
+			bindings = <
+				LEADING_NONES
+				ARTSEY_BT_TOP    &bt BT_SEL 2 &bt BT_SEL 1 &bt BT_SEL 0
+				MIDDLE_NONES
+				ARTSEY_BT_BOTTOM &bt BT_SEL 5 &bt BT_SEL 4 &bt BT_SEL 3
+				TRAILING_NONES
+			>;
+		};
+
+		ARTSEY_LAYER_CUSTOM
+	};
+};
+#endif
