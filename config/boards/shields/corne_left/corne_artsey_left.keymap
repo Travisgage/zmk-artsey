@@ -11,40 +11,39 @@
 // Enable ARTSEY Left
 #define ARTSEY_LEFT 1
 
-// ARTS Row
+// ARTS Row (K01-K04)
 #define KEY_A 4
 #define KEY_R 3
 #define KEY_T 2
 #define KEY_S 1
-// EYIO Row
+
+// EYIO Row (K07-K10)
 #define KEY_E 10
 #define KEY_Y 9
 #define KEY_I 8
 #define KEY_O 7
 
-// Outer/unused keys become real keys now:
-
 // K00
 #define LEADING_NONES  &kp LC(C)
 
-// K05, K10 (updated to swap shift and enter)
-#define MIDDLE_NONES   &kp LC(V) &kp LCTRL &kp ENTER // Enter mapped to K11 now
+// K05, K06  (DO NOT add a third binding here)
+#define MIDDLE_NONES   &kp LC(V) &kp LCTRL
 
-// K15, K20-K25, T0-T2 (10 total)
+// K11-K20
+// K11 = Enter
+// K12-K17 = Tab + arrows + LG(H) (as you had)
+// K18-K20 = thumbs: Shift, Backspace, Space
 #define TRAILING_NONES \
+  &kp ENTER           \
   &kp TAB             \
   &kp LEFT            \
   &kp DOWN            \
   &kp UP              \
   &kp RIGHT           \
   &kp LG(H)           \
+  &kp LSHFT           \
   &kp BACKSPACE       \
   &kp SPACE
-
-// Thumb buttons (left thumb = Shift, middle thumb = Backspace, right thumb = Space)
-#define THUMB_1 &kp LSHFT // Left thumb key: Shift
-#define THUMB_2 &kp BACKSPACE // Middle thumb key: Backspace
-#define THUMB_3 &kp SPACE // Right thumb key: Space
 
 // Include main artsey.io keymap
 #include "../../../artsey.dtsi"
