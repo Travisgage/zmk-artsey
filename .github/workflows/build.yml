@@ -122,42 +122,63 @@ jobs:
           echo "shield-arg=${SHIELD_ARG}" >> $GITHUB_OUTPUT
           echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
 
-      - name: Build (west build)
-        run: west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-
-      - name: Dump preprocessed DTS on failure
-        if: failure()
+      - name: Build (west build) + dump DTS on failure
         run: |
-          echo "=== Find *.dts.pre.tmp ==="
-          find build -type f -name "*.dts.pre.tmp" -print || true
+          set +e
 
-          echo "=== nice_nano.dts.pre.tmp around line 544 ==="
-          nl -ba build/zephyr/nice_nano.dts.pre.tmp | sed -n '520,560p' || true
+          echo "=== Building: board=${{ matrix.board }} shield=${{ matrix.shield }} ==="
+          echo "Command:"
+          echo "west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG=\"${GITHUB_WORKSPACE}/config\""
 
-          echo "=== Raw characters (cat -A) ==="
-          sed -n '540,548p' build/zephyr/nice_nano.dts.pre.tmp | cat -A || true
+          west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+          status=$?
+
+          if [ $status -ne 0 ]; then
+            echo "=== west build failed (exit=$status). Dumping preprocessed DTS ==="
+
+            echo "=== Find *.dts.pre.tmp (build/**) ==="
+            find build -type f -name "*.dts.pre.tmp" -print || true
+
+            echo "=== Show build/zephyr/${{ matrix.board }}.dts.pre.tmp around line 544 (if present) ==="
+            if [ -f "build/zephyr/${{ matrix.board }}.dts.pre.tmp" ]; then
+              nl -ba "build/zephyr/${{ matrix.board }}.dts.pre.tmp" | sed -n '520,560p' || true
+              echo "=== Raw characters (cat -A), lines 540-548 ==="
+              sed -n '540,548p' "build/zephyr/${{ matrix.board }}.dts.pre.tmp" | cat -A || true
+            else
+              echo "WARN: build/zephyr/${{ matrix.board }}.dts.pre.tmp not found"
+              echo "=== Listing build/zephyr ==="
+              ls -la build/zephyr || true
+            fi
+          fi
+
+          exit $status
 
       - name: ARTSEY implementation dtsi file
         if: always()
         run: cat -n config/artsey.dtsi
 
-      - name: Generated DTS file
+      - name: Generated DTS file (if present)
         if: always()
         run: cat -n build/zephyr/${{ matrix.board }}.dts.pre.tmp || true
 
       - name: Prep artifact (artsey.dtsi)
-        run: cp config/artsey.dtsi ./artsey.dtsi
+        if: always()
+        run: cp config/artsey.dtsi ./artsey.dtsi || true
 
       - name: Prep artifact (DTS)
+        if: always()
         run: cp build/zephyr/${{ matrix.board }}.dts.pre.tmp ./${{ matrix.shield }}-${{ matrix.board }}.dts.pre.tmp || true
 
       - name: Prep artifact (HEX)
-        run: cp build/zephyr/zmk.hex ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.hex
+        if: always()
+        run: cp build/zephyr/zmk.hex ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.hex || true
 
       - name: Prep artifact (UF2)
-        run: cp build/zephyr/zmk.uf2 ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2
+        if: always()
+        run: cp build/zephyr/zmk.uf2 ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2 || true
 
       - name: Archive artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.variables.outputs.artifact-name }}
@@ -205,4 +226,3 @@ jobs:
           name: ${{ steps.date.outputs.date }}
           body: ${{ steps.release_text.outputs.release_text }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
