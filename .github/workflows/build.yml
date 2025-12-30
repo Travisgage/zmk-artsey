@@ -110,6 +110,7 @@ jobs:
 
       - name: Prepare variables
         id: variables
+        shell: bash
         run: |
           if [ -n "${{ matrix.shield }}" ]; then
             SHIELD_ARG="-DSHIELD=${{ matrix.shield }}"
@@ -119,62 +120,95 @@ jobs:
             ARTIFACT_NAME="${{ matrix.board }}-zmk-artsey"
           fi
 
-          echo "shield-arg=${SHIELD_ARG}" >> $GITHUB_OUTPUT
-          echo "artifact-name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
+          echo "shield-arg=${SHIELD_ARG}" >> "$GITHUB_OUTPUT"
+          echo "artifact-name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Build (west build)
         id: build
         continue-on-error: true
+        shell: bash
         run: |
           set +e
           echo "=== Building: board=${{ matrix.board }} shield=${{ matrix.shield }} ==="
           echo "Command:"
           echo "west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG=\"${GITHUB_WORKSPACE}/config\""
-          west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-          exit $?
+
+          # Tee output so we can parse the dtc error line number later
+          west build -s zmk/app -b ${{ matrix.board }} -- ${{ steps.variables.outputs.shield-arg }} -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" 2>&1 | tee build.log
+          RC=${PIPESTATUS[0]}
+          exit $RC
 
       - name: Dump preprocessed DTS on failure
         if: steps.build.outcome == 'failure'
+        shell: bash
         run: |
           PRE="build/zephyr/${{ matrix.board }}.dts.pre.tmp"
           echo "=== Find *.dts.pre.tmp (build/**) ==="
           find build -type f -name "*.dts.pre.tmp" -print || true
 
-          echo "=== Grep for keymap_transform_0 / pro_micro_i2c ==="
+          echo "=== build.log (tail) ==="
+          tail -n 80 build.log || true
+
+          echo "=== Parse failing line number from build.log ==="
+          ERR_LINE="$(sed -n 's/.*dts\.pre\.tmp:\([0-9]\+\)\..*/\1/p' build.log | tail -n 1)"
+          echo "Parsed failing line: ${ERR_LINE:-<none>}"
+
+          echo "=== Basic anchors in preprocessed file ==="
           [ -f "$PRE" ] && grep -n "keymap_transform_0" "$PRE" | head -n 20 || true
           [ -f "$PRE" ] && grep -n "pro_micro_i2c" "$PRE" | head -n 50 || true
 
-          echo "=== Show $PRE around line 520-590 ==="
-          [ -f "$PRE" ] && nl -ba "$PRE" | sed -n '520,590p' || true
+          if [ -n "$ERR_LINE" ] && [ -f "$PRE" ]; then
+            START=$((ERR_LINE-40)); [ $START -lt 1 ] && START=1
+            END=$((ERR_LINE+40))
 
-          echo "=== Raw characters (cat -A), lines 535-555 ==="
-          [ -f "$PRE" ] && sed -n '535,555p' "$PRE" | cat -A || true
+            echo "=== $PRE around line $ERR_LINE (nl -ba, ${START}-${END}) ==="
+            nl -ba "$PRE" | sed -n "${START},${END}p" || true
+
+            echo "=== Raw characters (cat -A) at/near failing line ==="
+            sed -n "${ERR_LINE},$((ERR_LINE+5))p" "$PRE" | cat -A || true
+          else
+            echo "NOTE: Could not parse ERR_LINE or $PRE missing. Dumping a reasonable window (520-590)."
+            [ -f "$PRE" ] && nl -ba "$PRE" | sed -n '520,590p' || true
+            [ -f "$PRE" ] && sed -n '535,555p' "$PRE" | cat -A || true
+          fi
 
       - name: ARTSEY implementation dtsi file
         if: always()
+        shell: bash
         run: cat -n config/artsey.dtsi
 
       - name: Generated DTS file (preprocessed)
         if: always()
+        shell: bash
         run: cat -n build/zephyr/${{ matrix.board }}.dts.pre.tmp || true
 
       - name: Prep artifact (artsey.dtsi)
         if: always()
+        shell: bash
         run: cp config/artsey.dtsi ./artsey.dtsi
 
       - name: Prep artifact (DTS)
         if: always()
+        shell: bash
         run: |
           PRE="build/zephyr/${{ matrix.board }}.dts.pre.tmp"
           [ -f "$PRE" ] && cp "$PRE" "./${{ matrix.shield }}-${{ matrix.board }}.dts.pre.tmp" || true
 
+      - name: Prep artifact (Build log)
+        if: always()
+        shell: bash
+        run: |
+          [ -f build.log ] && cp build.log "./${{ matrix.shield }}-${{ matrix.board }}.build.log" || true
+
       - name: Prep artifact (HEX)
         if: always()
+        shell: bash
         run: |
           [ -f build/zephyr/zmk.hex ] && cp build/zephyr/zmk.hex "${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.hex" || true
 
       - name: Prep artifact (UF2)
         if: always()
+        shell: bash
         run: |
           [ -f build/zephyr/zmk.uf2 ] && cp build/zephyr/zmk.uf2 "${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2" || true
 
@@ -186,6 +220,7 @@ jobs:
           path: |
             artsey.dtsi
             ${{ matrix.shield }}-${{ matrix.board }}.dts.pre.tmp
+            ${{ matrix.shield }}-${{ matrix.board }}.build.log
             ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.hex
             ${{ matrix.shield }}-${{ matrix.board }}-zmk-artsey.uf2
         continue-on-error: true
@@ -202,14 +237,16 @@ jobs:
     steps:
       - name: Get current date/time
         id: date
-        run: echo "date=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+        shell: bash
+        run: echo "date=$(date +'%Y%m%d-%H%M')" >> "$GITHUB_OUTPUT"
 
       - name: Generate release text
         id: release_text
+        shell: bash
         run: |
           echo "release_text=<b>Precompiled firmware files for ARTSEY</b><br><br>
           Download a firmware file by expanding Assets.
-          <br>Released on ${{ steps.date.outputs.date }}." >> $GITHUB_OUTPUT
+          <br>Released on ${{ steps.date.outputs.date }}." >> "$GITHUB_OUTPUT"
 
       - name: Download build artifacts for release
         uses: actions/download-artifact@v4
@@ -217,6 +254,7 @@ jobs:
           path: release
 
       - name: Zip all firmware files
+        shell: bash
         run: |
           mkdir -p zips
           cd release
