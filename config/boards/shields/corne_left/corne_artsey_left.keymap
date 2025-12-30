@@ -28,7 +28,7 @@
 #define LEADING_NONES  &kp LC(C)
 
 // K05, K10 (updated to swap shift and enter)
-#define MIDDLE_NONES   &kp LC(V) &kp LCTRL &kp ENTER // Keep ENTER here for now, THUMB_1 will be for Shift
+#define MIDDLE_NONES   &kp LC(V) &kp LCTRL &kp ENTER // Enter mapped to K11 now
 
 // K15, K20-K25, T0-T2 (10 total)
 #define TRAILING_NONES \
@@ -41,10 +41,10 @@
   &kp BACKSPACE       \
   &kp SPACE
 
-// Thumb buttons (Shift moved to Thumb 1)
-#define THUMB_1 &kp LSHFT // Shift is now on the thumb key
-#define THUMB_2 19
-#define THUMB_3 20
+// Thumb buttons (left thumb = Shift, middle thumb = Backspace, right thumb = Space)
+#define THUMB_1 &kp LSHFT // Left thumb key: Shift
+#define THUMB_2 &kp BACKSPACE // Middle thumb key: Backspace
+#define THUMB_3 &kp SPACE // Right thumb key: Space
 
 // Include main artsey.io keymap
 #include "../../../artsey.dtsi"
