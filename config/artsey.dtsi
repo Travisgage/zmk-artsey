@@ -23,10 +23,7 @@
 #define NONE9(X) NONE8(X) X
 #define NONE10(X) NONE9(X) X
 
-#define NONE(HUNDREDS,TENS,ONES) \
-  NONE##HUNDREDS(NONE10(NONE10(&none))) \
-  NONE##TENS(NONE10(&none)) \
-  NONE##ONES(&none)
+#define NONE(HUNDREDS,TENS,ONES) \  NONE##HUNDREDS(NONE10(NONE10(&none))) \  NONE##TENS(NONE10(&none)) \  NONE##ONES(&none)
 
 /*****************************************
  * ARTSEY website : https://www.artsey.io
@@ -159,30 +156,10 @@
 *****************************************/
 #if !defined ARTSEY_LAYER_CUSTOM
 #if defined ARTSEY_RIGHT
-#define ARTSEY_LAYER_CUSTOM                                            \
-		custom {                                                       \
-			label = "Custom";                                          \
-			bindings = <                                               \
-				LEADING_NONES                                          \
-				&kp C_MUTE &kp INS   &kp C_VOL_UP  &none               \
-				MIDDLE_NONES                                           \
-				&sk RSHFT  &kp PSCRN &kp C_VOL_DN  &mo LAYER_ID_CUSTOM \
-				TRAILING_NONES                                         \
-			>;                                                         \
-		};
+#define ARTSEY_LAYER_CUSTOM                                            \		custom {                                                       \			label = "Custom";                                          \			bindings = <                                               \				LEADING_NONES                                          \				&kp C_MUTE &kp INS   &kp C_VOL_UP  &none               \				MIDDLE_NONES                                           \				&sk RSHFT  &kp PSCRN &kp C_VOL_DN  &mo LAYER_ID_CUSTOM \				TRAILING_NONES                                         \			>;                                                         \		};
 #endif
 #if defined ARTSEY_LEFT
-#define ARTSEY_LAYER_CUSTOM                                            \
-		custom {                                                       \
-			label = "Custom";                                          \
-			bindings = <                                               \
-				LEADING_NONES                                          \
-				&none          &kp C_VOL_UP  &kp INS   &kp C_MUTE \
-				MIDDLE_NONES                                           \
-				&mo LAYER_ID_CUSTOM &kp C_VOL_DN  &kp PSCRN &sk RSHFT  \
-				TRAILING_NONES                                         \
-			>;                                                         \
-		};
+#define ARTSEY_LAYER_CUSTOM                                            \		custom {                                                       \			label = "Custom";                                          \			bindings = <                                               \				LEADING_NONES                                          \				&none          &kp C_VOL_UP  &kp INS   &kp C_MUTE \				MIDDLE_NONES                                           \				&mo LAYER_ID_CUSTOM &kp C_VOL_DN  &kp PSCRN &sk RSHFT  \				TRAILING_NONES                                         \			>;                                                         \		};
 #endif
 #endif
 

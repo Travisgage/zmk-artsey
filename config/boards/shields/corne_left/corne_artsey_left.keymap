@@ -30,17 +30,7 @@
 #define MIDDLE_NONES   &kp LC(V) &kp LCTRL
 
 // K11-K20 (10 total)
-#define TRAILING_NONES \
-  &kp ENTER           \
-  &kp TAB             \
-  &kp LEFT            \
-  &kp DOWN            \
-  &kp UP              \
-  &kp RIGHT           \
-  &kp LG(H)           \
-  &kp LSHFT           \
-  &kp BACKSPACE       \
-  &kp SPACE
+#define TRAILING_NONES \  &kp ENTER           \  &kp TAB             \  &kp LEFT            \  &kp DOWN            \  &kp UP              \  &kp RIGHT           \  &kp LG(H)           \  &kp LSHFT           \  &kp BACKSPACE       \  &kp SPACE
 
 // Include main artsey keymap
 #include "../../../artsey.dtsi"
