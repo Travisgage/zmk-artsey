@@ -249,6 +249,9 @@
 		/* Beta 0.9.0: '?' is a combo (not a symbol-layer key) */
 		combo_question   { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_S KEY_O>; bindings = <&kp QMARK>; };
 
+		/* Beta 0.9.0: quote is R+Y */
+		combo_single_quote { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_Y>; bindings = <&kp SQT>; };
+
 		/* Optional hardening (commented by default): require-prior-idle-ms reduces accidental sticky mods from overlap.
 		 * Uncomment if you still see “stuck GUI” behavior after shortening TIMEOUT_STICKY_MOD_KEY.
 		 *
@@ -263,14 +266,8 @@
 
 		combo_backspace  { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_R>; bindings = <&kp BACKSPACE>; };
 		combo_delete     { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_I KEY_R>; bindings = <&kp DELETE>; };
-		combo_shift_lock { timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_R KEY_Y>; bindings = <&kt LSHFT>; };
 
-		/*
-		 * NOTE (quote chord):
-		 * Keep the same keys, but define it *before* comma/period so it wins when chorded with A+Y+I.
-		 * This prevents the A+Y (comma) / A+I (period) subset combos from firing first.
-		 */
-		combo_single_quote { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_3>; key-positions = <KEY_A KEY_Y KEY_I>; bindings = <&kp SQT>; };
+		/* Removed: combo_shift_lock (R+Y) to avoid clashing with quote; CAPS is still on A+Y+I+O. */
 
 		combo_b           { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_O>; bindings = <&kp B>; };
 		combo_c           { layers = <LAYER_ID_BASE>; timeout-ms = <TIMEOUT_COMBO_2>; key-positions = <KEY_E KEY_Y>; bindings = <&kp C>; };
