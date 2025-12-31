@@ -33,7 +33,8 @@
 
 // K15, K20-K25, T0-T2 (10 total)
 // IMPORTANT: single-line macro (no "\" continuations)
-#define TRAILING_NONES &kp ENTER &kp TAB &kp LEFT &kp DOWN &kp UP &kp RIGHT &kp LG(H) &kp LSHFT &kp BACKSPACE &kp SPACE
+// Swapped LSHFT and BACKSPACE on thumbs:
+#define TRAILING_NONES &kp ENTER &kp TAB &kp LEFT &kp DOWN &kp UP &kp RIGHT &kp LG(H) &kp BACKSPACE &kp LSHFT &kp SPACE
 
 // Include main artsey.io keymap
 #include "../../../artsey.dtsi"
